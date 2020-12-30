@@ -19,7 +19,7 @@
 		<spring-cloud.version>Hoxton.SR8</spring-cloud.version>
 		<org.mapstruct.version>1.3.1.Final</org.mapstruct.version>
 		<org.lombok.version>1.18.10</org.lombok.version>
-		<vn.tat.common.lib.version>0.0.1-SNAPSHOT</vn.tat.common.lib.version>
+		<vn.microservice.common.lib.version>0.0.1-SNAPSHOT</vn.microservice.common.lib.version>
 	</properties>
 
 	<dependencies>
@@ -102,9 +102,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>vn.tat.ecommerce.common</groupId>
-			<artifactId>stream-ecommerce-common-lib</artifactId>
-			<version>${vn.tat.common.lib.version}</version>
+			<groupId>vn.microservice.streaming.common.lib</groupId>
+			<artifactId>microservice-streaming-common-lib</artifactId>
+			<version>${vn.microservice.common.lib.version}</version>
 		</dependency>
 	</dependencies>
 
