@@ -26,9 +26,9 @@ import java.util.function.Consumer;
  * NOTE this class we are using the functional programming model (we can also use the imperative programming model that is the old fashion style with @streamListener)
  */
 @EnableBinding
-public class OrderCountByUserTopology {
+public class OrderCountByUserProcessorTopology {
 
-    private final Logger log = LoggerFactory.getLogger(OrderCountByUserTopology.class);
+    private final Logger log = LoggerFactory.getLogger(OrderCountByUserProcessorTopology.class);
 
     @Bean
     public Consumer<KStream<Byte, OrderStreamDTO>> orderCountByUserId() {
