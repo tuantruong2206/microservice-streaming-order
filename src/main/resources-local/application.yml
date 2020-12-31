@@ -7,7 +7,7 @@ spring:
       instance-count: 2
       instance-index: 1
       function:
-        definition: process;anotherProcess;orderProcess;orderVerifiedConsumer  # active 4 processes of kafka stream
+        definition: orderCountByUserId;orderVerifiedConsumer  # active 4 processes of kafka stream
       kafka:
         binder:
           configuration:
@@ -25,12 +25,8 @@ spring:
               application.server: localhost:8091
             functions:
               #            #APPLICATION ID if we have more than one stream app within same springboot
-              process:
-                applicationId: order-count
-              anotherProcess:
-                applicationId: print-out
-              orderProcess:
-                applicationId: order-process
+              orderCountByUserId:
+                applicationId: order-count-by-user-id-instance
               orderVerifiedConsumer:
                 applicationId: order-verified-consumed-instance
             state-store-retry:
@@ -38,26 +34,20 @@ spring:
               backoff-period: 2000
       bindings:
         order-print-in:
-#          consumer:
-#            applicationId: order-print
           destination: orders
           contentType: application/json
         order-verified-in:
-#          applicationId: order-process
           destination: order-verified
           contentType: application/json
 #          nativeDecoding: true
 #          consumer:
 #            keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
 #            valueSerde: org.apache.kafka.common.serialization.Serdes$JsonSerde
-        order-in:
-          destination: orders
-          contentType: application/json
-        order-out:
-          destination: orders
-          contentType: application/json
         orderVerifiedConsumer-in-0:
           destination: order-verified
+          contentType: application/json
+        orderCountByUserId-in-0:
+          destination: orders-stream
           contentType: application/json
 
 
