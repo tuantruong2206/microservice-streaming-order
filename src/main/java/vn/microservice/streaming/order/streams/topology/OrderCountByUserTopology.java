@@ -7,16 +7,15 @@ import org.apache.kafka.streams.kstream.Grouped;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Materialized;
 import org.apache.kafka.streams.kstream.SessionWindows;
-import org.apache.kafka.streams.state.KeyValueStore;
+import org.apache.kafka.streams.state.SessionStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.support.serializer.JsonSerde;
 import vn.microservice.streaming.common.lib.dto.OrderStreamDTO;
-
+import vn.microservice.streaming.order.dto.UserOrderPer3MinDTO;
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
@@ -44,15 +43,20 @@ public class OrderCountByUserTopology {
                  * */
                 //https://stackoverflow.com/questions/47569359/getting-class-cast-exception-in-kafka-stream-api
                 .windowedBy(SessionWindows.with(Duration.ofMinutes(3)))
-                .aggregate(() -> new OrderStreamDTO(),
-                        (key, newV, aggValue) -> new OrderStreamDTO(aggValue.getUserid(), aggValue.getOrderId(), aggValue.getTicker(),
-                                aggValue.getQuality() + newV.getQuality(),
-                                aggValue.getAmount() + newV.getAmount(), newV.getStatus(), newV.getCreatedAt(), newV.getUpdatedAt()),
-//                        (k, v, a) -> simpleMerge(v, a),
-                        Materialized.<String, OrderStreamDTO, KeyValueStore<Bytes, byte[]>>as("order-verified-consumed-state-store")
-                                .withKeySerde(Serdes.String()).withValueSerde(new JsonSerde<>(OrderStreamDTO.class)));
-
-                ;
+                .aggregate(() -> new UserOrderPer3MinDTO(),
+                        /**
+                         * newValue OrderStreamDTO
+                         * aggValue UserOrderPer3MinDTO
+                         */
+                        (key, newValue, aggValue) -> {
+                            aggValue.addOrder(newValue, key);
+                            return aggValue;
+                        },
+                        (key, newValue, aggValue) -> {
+                            return aggValue;
+                        },
+                        Materialized.<String, UserOrderPer3MinDTO, SessionStore<Bytes, byte[]>>as("state-store-user-order-3-min")
+                                .withKeySerde(Serdes.String()).withValueSerde(new JsonSerde<>(UserOrderPer3MinDTO.class)));
     }
 
     private OrderStreamDTO simpleMerge(OrderStreamDTO newValue, OrderStreamDTO aggValue) {
