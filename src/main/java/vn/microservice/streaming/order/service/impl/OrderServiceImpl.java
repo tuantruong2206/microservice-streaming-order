@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.stereotype.Service;
 import org.springframework.util.MimeTypeUtils;
 import vn.microservice.streaming.common.lib.dto.OrderStreamDTO;
 import vn.microservice.streaming.order.dto.OrderDTO;
@@ -17,6 +18,7 @@ import vn.microservice.streaming.order.streams.OrderStream;
  * @version 1.0
  * @date 12/30/2020 10:45 AM
  */
+@Service
 public class OrderServiceImpl implements OrderService {
 
     private final Logger log = LoggerFactory.getLogger(OrderServiceImpl.class);
