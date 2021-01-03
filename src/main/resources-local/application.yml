@@ -7,7 +7,7 @@ spring:
       instance-count: 2
       instance-index: 1
       function:
-        definition: orderCountByUserId;orderVerifiedConsumer  # active 4 processes of kafka stream
+        definition: orderCountByUserId;orderStoreProcess;verifiedOrderProcess  # active 3 processes of kafka stream
       kafka:
         binder:
           configuration:
@@ -24,31 +24,37 @@ spring:
             configuration:
               application.server: localhost:8091
             functions:
-              #            #APPLICATION ID if we have more than one stream app within same springboot
+              #            #APPLICATION ID if we have multi stream app within the same springboot app
               orderCountByUserId:
                 applicationId: order-count-by-user-id-instance
-              orderVerifiedConsumer:
-                applicationId: order-verified-consumed-instance
+              orderStoreProcess:
+                applicationId: order-store-process-id-instance
+              verifiedOrderProcess:
+                applicationId: verified-order-process-id-instance
             state-store-retry:
               max-attempts: 3
               backoff-period: 2000
       bindings:
-        order-print-in:
-          destination: orders
-          contentType: application/json
-        order-verified-in:
-          destination: order-verified
+        rest-order-in:
+          destination: microservice-orders
           contentType: application/json
 #          nativeDecoding: true
 #          consumer:
 #            keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
 #            valueSerde: org.apache.kafka.common.serialization.Serdes$JsonSerde
-        orderVerifiedConsumer-in-0:
-          destination: order-verified
-          contentType: application/json
         orderCountByUserId-in-0:
-          destination: orders-stream
+          destination: microservice-orders
           contentType: application/json
+        orderStoreProcess-in-0:
+          destination: microservice-orders
+          contentType: application/json
+        verifiedOrderProcess-in-0:
+          destination: microservice-verified-orders
+          contentType: application/json
+        verifiedOrderProcess-out-0:
+          destination: microservice-completed-orders
+          contentType: application/json
+
 
 
 

@@ -30,8 +30,14 @@ public class OrderCountByUserProcessorTopology {
 
     private final Logger log = LoggerFactory.getLogger(OrderCountByUserProcessorTopology.class);
 
+    private static final String MICROSERVICE_STATE_STORE_USER_ORDER_3_MIN = "state-store-user-order-3-min";
+
+    /**
+     * This method helps to count and store order by user with 3 min to local state store and backed up to kafka broker
+     * @return
+     */
     @Bean
-    public Consumer<KStream<Byte, OrderStreamDTO>> orderCountByUserId() {
+    public Consumer<KStream<Byte, OrderStreamDTO>> orderCountByUserIdProcess() {
         return input -> input.peek((k, v) -> log.info("Received Order {}", v))
                 .map((k, v) -> new KeyValue<>(v.getUserid(), v))
                 .groupByKey(Grouped.with(Serdes.String(), new JsonSerde<>(OrderStreamDTO.class)))
@@ -55,12 +61,12 @@ public class OrderCountByUserProcessorTopology {
                         (key, newValue, aggValue) -> {
                             return aggValue;
                         },
-                        Materialized.<String, UserOrderPer3MinDTO, SessionStore<Bytes, byte[]>>as("state-store-user-order-3-min")
+                        Materialized.<String, UserOrderPer3MinDTO, SessionStore<Bytes, byte[]>>as(MICROSERVICE_STATE_STORE_USER_ORDER_3_MIN)
                                 .withKeySerde(Serdes.String()).withValueSerde(new JsonSerde<>(UserOrderPer3MinDTO.class)));
     }
 
     private OrderStreamDTO simpleMerge(OrderStreamDTO newValue, OrderStreamDTO aggValue) {
-        return new OrderStreamDTO(aggValue.getUserid(), aggValue.getOrderId(), aggValue.getTicker(),
+        return new OrderStreamDTO(aggValue.getUserid(), aggValue.getOrderId(), aggValue.getProdId(),
                 aggValue.getQuality() + newValue.getQuality(),
                 aggValue.getAmount() + newValue.getAmount(), aggValue.getStatus(), aggValue.getCreatedAt(), aggValue.getUpdatedAt());
     }
