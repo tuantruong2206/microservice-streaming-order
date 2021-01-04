@@ -22,14 +22,13 @@ public class OrderValidationPer3MinDTO {
     private Long count;
     List<VerifiedOrderStreamDTO> verifiedOrders;
     List<Long> orderIds;
-    List<String> usernames;
+    List<String> userIds;
 
     public OrderValidationPer3MinDTO() {}
 
     public void addVerifiedOrder(VerifiedOrderStreamDTO verifiedOrder) {
         this.verifiedOrders.add(verifiedOrder);
         orderIds.add(verifiedOrder.getOrderId());
-        usernames.add(verifiedOrder.getUsername());
+        userIds.add(verifiedOrder.getUserId());
     }
-
 }
