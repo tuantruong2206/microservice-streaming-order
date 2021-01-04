@@ -1,16 +1,13 @@
 package vn.microservice.streaming.order.streams.topology;
 
-import org.apache.kafka.common.serialization.Serdes;
+
 import org.apache.kafka.streams.KeyValue;
-import org.apache.kafka.streams.kstream.Grouped;
 import org.apache.kafka.streams.kstream.KStream;
-import org.apache.kafka.streams.kstream.Produced;
 import org.apache.kafka.streams.kstream.SessionWindows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.context.annotation.Bean;
-import org.springframework.kafka.support.serializer.JsonSerde;
 import vn.microservice.streaming.common.lib.dto.VerifiedOrderStreamDTO;
 import vn.microservice.streaming.order.dto.OrderValidationPer3MinDTO;
 
