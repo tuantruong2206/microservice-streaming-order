@@ -15,7 +15,7 @@ spring:
             default:
               key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
               value.serde: org.apache.kafka.common.serialization.Serdes$JsonSerde
-          brokers: 10.218.188.198:9092
+          brokers: 192.168.100.14:9092
           autoAddPartitions: true
           minPartitionCount: 4
           replicationFactor: 1
