@@ -27,9 +27,10 @@ public class VerifiedOrderProcessorTopology {
     private final static String ORDER_COMPLETE_TOPIC = "microservice-order-complete";
 
     @Bean
-    public Function<KStream<Object, VerifiedOrderStreamDTO>, KStream<?, OrderValidationPer3MinDTO>> verifiedOrderProcess() {
-        return input -> input.peek((k, v) -> log.info("+++ order verified receive order validation {}", v))
-                .map((k, v) -> new KeyValue<>(v.getOrderId(), v))
+    public Function<KStream<Long, VerifiedOrderStreamDTO>, KStream<?, OrderValidationPer3MinDTO>> verifiedOrderProcess() {
+        return input -> input.peek((k, v) -> log.info("+++ order verified receive order validation with KEY {} value {}", k, v))
+                // no need to re-map the key, because payment, inventory and shipping services produce key by orderid and value VerifiedOrderStreamDTO
+//                .map((k, v) -> new KeyValue<>(v.getOrderId(), v))
                 .groupByKey()
 //                .groupByKey(Grouped.with(Serdes.String(), new JsonSerde<>(VerifiedOrder.class)))
                 .windowedBy(SessionWindows.with(Duration.ofMinutes(3)))

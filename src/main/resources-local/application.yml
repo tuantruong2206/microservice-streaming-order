@@ -54,6 +54,9 @@ spring:
         verifiedOrderProcess-out-0:
           destination: microservice-completed-orders
           contentType: application/json
+          producer:
+            keySerde: org.apache.kafka.common.serialization.Serdes$LongSerde
+            valueSerde: org.apache.kafka.common.serialization.Serdes$JsonSerde
 
 
 
