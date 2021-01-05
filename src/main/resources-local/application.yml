@@ -5,7 +5,7 @@ spring:
   cloud:
     stream:
       instance-count: 2
-      instance-index: 1
+      instance-index: 0
       function:
         definition: orderCountByUserId;orderStoreProcess;verifiedOrderProcess  # active 3 processes of kafka stream
       kafka:
@@ -15,14 +15,14 @@ spring:
             default:
               key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
               value.serde: org.apache.kafka.common.serialization.Serdes$JsonSerde
-          brokers: 192.168.100.14:9092
+          brokers: 10.218.188.198:9092
           autoAddPartitions: true
           minPartitionCount: 4
           replicationFactor: 1
         streams:
           binder:
             configuration:
-              application.server: localhost:8091
+              application.server: localhost:8090
             functions:
               #            #APPLICATION ID if we have multi stream app within the same springboot app
               orderCountByUserId:
@@ -35,7 +35,7 @@ spring:
               max-attempts: 3
               backoff-period: 2000
       bindings:
-        rest-order-in:
+        rest-order-out:
           destination: microservice-orders
           contentType: application/json
 #          nativeDecoding: true

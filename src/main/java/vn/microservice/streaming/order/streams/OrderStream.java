@@ -14,11 +14,8 @@ import org.springframework.messaging.SubscribableChannel;
  * private StreamBridge streamBridge;
  */
 public interface OrderStream {
-    final String INPUT = "rest-order-in";
 
     final String OUTPUT = "rest-order-out";
-    @Input(INPUT)
-    SubscribableChannel inboundOrder();
 
     @Output(OUTPUT)
     MessageChannel outboundOrder();

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.ToString;
 import vn.microservice.streaming.common.lib.dto.VerifiedOrderStreamDTO;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,7 +25,11 @@ public class OrderValidationPer3MinDTO {
     List<Long> orderIds;
     List<String> userIds;
 
-    public OrderValidationPer3MinDTO() {}
+    public OrderValidationPer3MinDTO() {
+        verifiedOrders = new ArrayList<>();
+        orderIds = new ArrayList<>();
+        userIds = new ArrayList<>();
+    }
 
     public void addVerifiedOrder(VerifiedOrderStreamDTO verifiedOrder) {
         this.verifiedOrders.add(verifiedOrder);

@@ -23,7 +23,7 @@ public class OrderDTO {
     public OrderDTO() {}
     private String userid;
     private Long orderId;
-    private String ticker;
+    private String prodId;
     private Long quality;
     private Double amount;
     private Status status;

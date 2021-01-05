@@ -13,6 +13,8 @@ import vn.microservice.streaming.order.dto.UserOrderPer3MinDTO;
 import vn.microservice.streaming.order.service.OrderService;
 import vn.microservice.streaming.order.streams.OrderStream;
 
+import java.time.Instant;
+
 /**
  * @author Tuan.Truong [Brian]
  * @version 1.0
@@ -33,7 +35,7 @@ public class OrderServiceImpl implements OrderService {
     public String createOrder(OrderDTO orderDTO) {
         log.info("Create order DTO {}", orderDTO);
         //TODO need to use mapper for better look of coding
-        OrderStreamDTO orderStreamDTO = new OrderStreamDTO(orderDTO.getUserid(), orderDTO.getOrderId(), orderDTO.getTicker(), orderDTO.getQuality(), orderDTO.getAmount(), orderDTO.getStatus(), orderDTO.getCreatedAt(), orderDTO.getUpdatedAt());
+        OrderStreamDTO orderStreamDTO = new OrderStreamDTO(orderDTO.getUserid(), orderDTO.getOrderId(), orderDTO.getProdId(), orderDTO.getQuality(), orderDTO.getAmount(), orderDTO.getStatus(), Instant.now(), Instant.now());
         MessageChannel messageChannel = this.orderStream.outboundOrder();
         messageChannel.send(MessageBuilder.withPayload(orderStreamDTO).setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON_VALUE).build());
         return "Success";
