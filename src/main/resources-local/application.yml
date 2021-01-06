@@ -51,6 +51,9 @@ spring:
         verifiedOrderProcess-in-0:
           destination: microservice-verified-orders
           contentType: application/json
+        verifiedOrderProcess-in-1:
+          destination: microservice-verified-customer
+          contentType: application/json
         verifiedOrderProcess-out-0:
           destination: microservice-completed-orders
           contentType: application/json

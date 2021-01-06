@@ -29,11 +29,13 @@ public class OrderValidationPer3MinDTO {
         verifiedOrders = new ArrayList<>();
         orderIds = new ArrayList<>();
         userIds = new ArrayList<>();
+        count = new Long(0);
     }
 
     public void addVerifiedOrder(VerifiedOrderStreamDTO verifiedOrder) {
         this.verifiedOrders.add(verifiedOrder);
         orderIds.add(verifiedOrder.getOrderId());
         userIds.add(verifiedOrder.getUserId());
+        count ++;
     }
 }
