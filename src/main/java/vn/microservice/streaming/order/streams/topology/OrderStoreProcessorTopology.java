@@ -29,7 +29,7 @@ public class OrderStoreProcessorTopology {
 
     private final Logger log = LoggerFactory.getLogger(OrderStoreProcessorTopology.class);
 
-    private static final String MICROSERIVCE_ORDER_STATE_STORE = "microservice-order-state-store";
+    public static final String MICROSERIVCE_ORDER_STATE_STORE = "microservice-order-state-store";
 
     /**
      * This method helps to save order request to local state store and backed up to kafka broker with initialize status PENDING
@@ -37,10 +37,10 @@ public class OrderStoreProcessorTopology {
      */
     @Bean
     public Consumer<KStream<Byte, OrderStreamDTO>> orderStoreProcess() {
-        return input -> input.peek((k, v) -> log.info("receive order {} then save to local state store", v))
+        return input -> input.peek((k, v) -> log.info("|||| receive order and SAVE state store {}", v))
                 .map((k, v) -> new KeyValue<>(v.getOrderId(), v)).groupByKey(Grouped.with(Serdes.Long(), new JsonSerde<>(OrderStreamDTO.class)))
                 .aggregate(() -> new OrderStreamDTO(),
-                        (k, nV, aggV) -> updateOrderStatus(nV),
+                        (k, nV, aggV) ->  updateOrderStatus(k, nV),
                         Materialized.<Long, OrderStreamDTO, KeyValueStore<Bytes, byte[]>>as(MICROSERIVCE_ORDER_STATE_STORE).withKeySerde(Serdes.Long()).withValueSerde(new JsonSerde<>(OrderStreamDTO.class)));
     }
 
@@ -49,7 +49,8 @@ public class OrderStoreProcessorTopology {
      * @param orderStreamDTO
      * @return
      */
-    private OrderStreamDTO updateOrderStatus(OrderStreamDTO orderStreamDTO) {
+    private OrderStreamDTO updateOrderStatus(Long k, OrderStreamDTO orderStreamDTO) {
+        log.info("SAVE ORDER STATE STORE with Key {} value {}", k, orderStreamDTO);
         return new OrderStreamDTO(orderStreamDTO.getUserid(), orderStreamDTO.getOrderId(), orderStreamDTO.getProdId(), orderStreamDTO.getQuality(), orderStreamDTO.getAmount(), Status.PENDING, Instant.now(), Instant.now());
     }
 }

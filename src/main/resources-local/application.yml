@@ -1,11 +1,11 @@
 server:
-  port: 8090
+  port: 8091
 
 spring:
   cloud:
     stream:
       instance-count: 2
-      instance-index: 0
+      instance-index: 1
       function:
         definition: orderCountByUserId;orderStoreProcess;verifiedOrderProcess  # active 3 processes of kafka stream
       kafka:
@@ -22,7 +22,7 @@ spring:
         streams:
           binder:
             configuration:
-              application.server: localhost:8090
+              application.server: localhost:8091
             functions:
               #            #APPLICATION ID if we have multi stream app within the same springboot app
               orderCountByUserId:
