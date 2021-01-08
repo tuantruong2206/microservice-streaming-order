@@ -1,6 +1,7 @@
 package vn.microservice.streaming.order.controller.rest;
 
 import org.apache.kafka.common.serialization.LongSerializer;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.kafka.streams.state.HostInfo;
 import org.apache.kafka.streams.state.QueryableStoreTypes;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
@@ -12,7 +13,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import vn.microservice.streaming.common.lib.dto.OrderStreamDTO;
 import vn.microservice.streaming.order.dto.OrderDTO;
+import vn.microservice.streaming.order.dto.UserOrderPer3MinDTO;
 import vn.microservice.streaming.order.service.OrderService;
+import vn.microservice.streaming.order.streams.topology.OrderCountByUserProcessorTopology;
 import vn.microservice.streaming.order.streams.topology.OrderStoreProcessorTopology;
 
 /**
@@ -20,11 +23,10 @@ import vn.microservice.streaming.order.streams.topology.OrderStoreProcessorTopol
  * @version 1.0
  * @date 12/30/2020 10:39 AM
  *
- *
  * Order Controller class: populate order rest API
  *
- *
  */
+
 @RestController
 @RequestMapping(path = "order", produces = MediaType.APPLICATION_JSON_VALUE)
 public class OrderController {
@@ -64,9 +66,30 @@ public class OrderController {
             RestTemplate restTemplate = new RestTemplate();
             orderStreamDTO = restTemplate.getForObject(String.format("http://%s:%d/%s", host.host(), host.port(), "/order/"+ orderId), OrderStreamDTO.class);
         }
-
         log.info("****||||*** QUERY result : {}", orderStreamDTO);
         return orderStreamDTO;
     }
+
+    @GetMapping("/user-order-3-min/{userId}")
+    public UserOrderPer3MinDTO getOrderbyId(@PathVariable("userId") String userId) {
+        final ReadOnlyKeyValueStore<String, UserOrderPer3MinDTO> keyValueStore;
+        UserOrderPer3MinDTO userOrderPer3MinDTO = null;
+
+        final HostInfo host = interactiveQueryService.getHostInfo(OrderCountByUserProcessorTopology.MICROSERVICE_STATE_STORE_USER_ORDER_3_MIN, userId, new StringSerializer());
+        log.info("**** Query userID {} stay on the host {}", userId, host);
+
+        if (interactiveQueryService.getCurrentHostInfo().equals(host)) {
+            log.info("send request served from the same host:");
+            keyValueStore = interactiveQueryService.getQueryableStore(OrderCountByUserProcessorTopology.MICROSERVICE_STATE_STORE_USER_ORDER_3_MIN, QueryableStoreTypes.<String, UserOrderPer3MinDTO>keyValueStore());
+            userOrderPer3MinDTO = keyValueStore.get(userId);
+        } else {
+            log.info("send request served from different host: {}", host);
+            RestTemplate restTemplate = new RestTemplate();
+            userOrderPer3MinDTO = restTemplate.getForObject(String.format("http://%s:%d/%s", host.host(), host.port(), "/user-order-3-min/" + userId), UserOrderPer3MinDTO.class);
+        }
+        log.info("****||||*** QUERY result : {}", userOrderPer3MinDTO);
+        return userOrderPer3MinDTO;
+    }
+
 
 }

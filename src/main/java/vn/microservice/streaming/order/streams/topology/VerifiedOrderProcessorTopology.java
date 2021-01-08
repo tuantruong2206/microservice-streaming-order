@@ -10,11 +10,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.support.serializer.JsonSerde;
+import vn.microservice.streaming.common.lib.dto.OrderValidationPer3MinStreamDTO;
 import vn.microservice.streaming.common.lib.dto.VerifiedOrderStreamDTO;
-import vn.microservice.streaming.order.dto.OrderValidationPer3MinDTO;
 
 import java.time.Duration;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 
@@ -28,23 +27,26 @@ import java.util.function.Function;
 public class VerifiedOrderProcessorTopology {
 
     private final static Logger log = LoggerFactory.getLogger(VerifiedOrderProcessorTopology.class);
-    private final static String ORDER_COMPLETE_TOPIC = "microservice-order-complete";
 
+    /**
+     * send completed signal message to topic microservice-completed-orders for sending email
+     * @return
+     */
     @Bean
-    public Function<KStream<Long, VerifiedOrderStreamDTO>, KStream<?, OrderValidationPer3MinDTO>> verifiedOrderProcess() {
+    public Function<KStream<Long, VerifiedOrderStreamDTO>, KStream<?, OrderValidationPer3MinStreamDTO>> verifiedOrderProcess() {
         return input -> input.peek((k, v) -> log.info("+++ order verified receive order validation with KEY {} value {}", k, v))
                 // no need to re-map the key, because payment, inventory and shipping services produce key by orderid and value VerifiedOrderStreamDTO
 //                .map((k, v) -> new KeyValue<>(v.getOrderId(), v))
                 .groupByKey()
 //                .groupByKey(Grouped.with(Serdes.String(), new JsonSerde<>(VerifiedOrder.class)))
                 .windowedBy(SessionWindows.with(Duration.ofMinutes(3)))
-                .aggregate(() -> new OrderValidationPer3MinDTO(),
+                .aggregate(() -> new OrderValidationPer3MinStreamDTO(),
                         (k, nValue, aggValue) ->   {
                             aggValue.addVerifiedOrder(nValue);
                             return aggValue;
                         },
                         (k, nValue, aggValue) -> aggValue,
-                        Materialized.<Long, OrderValidationPer3MinDTO, SessionStore<Bytes, byte[]>>as("agg-verified-order-3-min").withKeySerde(Serdes.Long()).withValueSerde(new JsonSerde<>(OrderValidationPer3MinDTO.class)))
+                        Materialized.<Long, OrderValidationPer3MinStreamDTO, SessionStore<Bytes, byte[]>>as("agg-verified-order-3-min").withKeySerde(Serdes.Long()).withValueSerde(new JsonSerde<>(OrderValidationPer3MinStreamDTO.class)))
                 .filter((k, v) -> v.getCount() >=3 || v == null)
                 //solution 2 go with function programming
                 .toStream((k, v) -> k.key()).map((k, v) -> new KeyValue<>(null, v))

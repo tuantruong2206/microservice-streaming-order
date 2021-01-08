@@ -30,7 +30,7 @@ public class OrderCountByUserProcessorTopology {
 
     private final Logger log = LoggerFactory.getLogger(OrderCountByUserProcessorTopology.class);
 
-    private static final String MICROSERVICE_STATE_STORE_USER_ORDER_3_MIN = "state-store-user-order-3-min";
+    public static final String MICROSERVICE_STATE_STORE_USER_ORDER_3_MIN = "state-store-user-order-3-min";
 
     /**
      * This method helps to count and store order by user with 3 min to local state store and backed up to kafka broker
@@ -38,7 +38,7 @@ public class OrderCountByUserProcessorTopology {
      */
     @Bean
     public Consumer<KStream<Byte, OrderStreamDTO>> orderCountByUserIdProcess() {
-        return input -> input.peek((k, v) -> log.info("Received Order {}", v))
+        return input -> input.peek((k, v) -> log.info("Received Order for 3MIN {}", v))
                 .map((k, v) -> new KeyValue<>(v.getUserid(), v))
                 .groupByKey(Grouped.with(Serdes.String(), new JsonSerde<>(OrderStreamDTO.class)))
                 //WHY do we have serdes here?
