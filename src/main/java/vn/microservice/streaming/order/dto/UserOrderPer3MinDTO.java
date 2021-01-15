@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.ToString;
 import vn.microservice.streaming.common.lib.dto.OrderStreamDTO;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class UserOrderPer3MinDTO {
 
     public UserOrderPer3MinDTO() {}
     private String user;
-    private List<OrderStreamDTO> orderHistory;
+    private List<OrderStreamDTO> orderHistory = new ArrayList<>();
     private Date start;
     private Date end;
 

@@ -7,7 +7,7 @@ spring:
       instance-count: 2
       instance-index: 1
       function:
-        definition: orderCountByUserId;orderStoreProcess;verifiedOrderProcess  # active 3 processes of kafka stream
+        definition: orderStoreProcess;verifiedOrderProcess;orderCountByUserIdProcess  # active 3 processes of kafka stream
       kafka:
         binder:
           configuration:
@@ -25,7 +25,7 @@ spring:
               application.server: localhost:8091
             functions:
               #            #APPLICATION ID if we have multi stream app within the same springboot app
-              orderCountByUserId:
+              orderCountByUserIdProcess:
                 applicationId: order-count-by-user-id-instance
               orderStoreProcess:
                 applicationId: order-store-process-id-instance
@@ -42,10 +42,13 @@ spring:
 #          consumer:
 #            keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
 #            valueSerde: org.apache.kafka.common.serialization.Serdes$JsonSerde
-        orderCountByUserId-in-0:
+#        orderCountByUserId-in-0:
+#          destination: microservice-orders
+#          contentType: application/json
+        orderStoreProcess-in-0:
           destination: microservice-orders
           contentType: application/json
-        orderStoreProcess-in-0:
+        orderCountByUserIdProcess-in-0:
           destination: microservice-orders
           contentType: application/json
         verifiedOrderProcess-in-0:
